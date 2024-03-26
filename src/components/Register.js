@@ -1,26 +1,13 @@
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useReducer } from "react";
-import { createServer, Model } from "miragejs";
 import Footer from "./Footer";
 import Header from "./Header";
 import "./Register.css";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-// MirageJS setup
-createServer({
-  models: {
-    user: Model,
-  },
-  routes() {
-    this.post("/api/register", (schema, request) => {
-      const requestData = JSON.parse(request.requestBody);
-      const newUser = schema.users.create(requestData);
-      return newUser;
-    });
-  },
-});
 
 const ACTIONS = {
   SET_DATA: "set-data",
@@ -37,8 +24,9 @@ function reducer(state, action) {
 
 const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
-
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
+
 
   const [state, dispatch] = useReducer(reducer, {
     username: "",
@@ -73,14 +61,17 @@ const Register = () => {
         payload: { username: "", password: "", confirmPassword: "" },
       });
 
+
       enqueueSnackbar("Registered Successfully", { variant: "success" });
-    } catch (error) {
-      setLoading(false);
-      enqueueSnackbar(
-        "Something went wrong. Check that the backend is running, reachable, and returns valid JSON.",
-        { variant: "error" }
-      );
-    }
+      navigate("/login");
+    } catch(e){
+        setLoading(false);
+        if(e.response && e.response.status === 400){
+          enqueueSnackbar(e.response.data.message, {variant: 'error'})
+        } else {
+          enqueueSnackbar('Something went wrong. Check that the backend is running, reachable and returns valid JSON.', {variant:'error'})
+        }
+      }
   };
 
   const validateInput = (data) => {
@@ -138,6 +129,7 @@ const Register = () => {
               placeholder="Enter Username"
               fullWidth
               onChange={handleChange}
+              value={state.username}
             />
             <TextField
               id="password"
@@ -149,6 +141,7 @@ const Register = () => {
               fullWidth
               placeholder="Enter a password with minimum 6 characters"
               onChange={handleChange}
+              value={state.password}
             />
             <TextField
               id="confirmPassword"
@@ -158,6 +151,7 @@ const Register = () => {
               type="password"
               fullWidth
               onChange={handleChange}
+              value={state.confirmPassword}
             />
             {loading ? (
               <CircularProgress
@@ -169,7 +163,12 @@ const Register = () => {
                 Register Now
               </Button>
             )}
-            <p className="secondary-action">Already have an account? </p>
+            <p className="secondary-action">
+            Already have an account?{" "}
+            <Link className="link" to="/login">
+              Login here
+            </Link>
+          </p>
           </Stack>
         </form>
       </Box>

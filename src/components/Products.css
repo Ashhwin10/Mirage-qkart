@@ -1,0 +1,8 @@
+.product {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: aliceblue;
+    background-color: green;
+  }
+  
