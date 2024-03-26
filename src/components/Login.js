@@ -1,8 +1,7 @@
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import axios from "axios";
 import { useSnackbar } from "notistack";
-import React, { useState } from "react";
+import React, { useState , useReducer } from "react";
 import { useHistory, Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -10,14 +9,31 @@ import Header from "./Header";
 import "./Login.css";
 
 
+const ACTIONS = {
+SET_FORMDATA:"set-formdata"
+}
+
+
+function reducer(state,action){
+switch(action.type) {
+  case ACTIONS.SET_FORMDATA:
+    return{...state,...action.payload};
+    default:
+    return state;
+}
+}
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [formData, setFormData] = useState({ username: "", password: "" });
+
+  const [state, dispatch] = useReducer(reducer,{username: "", password: ""});
+  // const [formData, setFormData] = useState({ username: "", password: "" });
   const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    dispatch({ type: ACTIONS.SET_FORMDATA, payload: { [name]: value } });
   };
+  
  
 
   const login = async (formData) => {
@@ -38,10 +54,7 @@ const Login = () => {
       let { username, success, token, balance } = data;
       // console.log(username,success,token,balance)
 
-      setFormData({
-        username: "",
-        password: "",
-      });
+      dispatch({type:ACTIONS.SET_FORMDATA});
 
       setLoading(false);
       enqueueSnackbar("logged in successfully", { variant: "success" });
@@ -100,7 +113,7 @@ const Login = () => {
             placeholder="Enter Username"
             fullWidth
             onChange={handleChange}
-            value={formData.username}
+            value={state.username}
           />
           <TextField
             id="password"
@@ -112,12 +125,12 @@ const Login = () => {
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
             onChange={handleChange}
-            value={formData.password}
+            value={state.password}
           />
           <Button
             className="button"
             variant="contained"
-            onClick={() => login(formData)}
+            onClick={() => login(state)}
           >
             LOGIN TO QKART
           </Button>
