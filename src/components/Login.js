@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
 import "./Login.css";
+import { useDispatch, useSelector } from 'react-redux';
+import {loginSuccess} from "../redux/reduxSlice.js";
 
 
 const ACTIONS = {
@@ -23,6 +25,7 @@ switch(action.type) {
 }
 }
 const Login = () => {
+  const dispatchh = useDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -49,19 +52,26 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
-      let data = response.json;
+      let data = await response.json();
+      console.log("data",data)
 
-      let { username, success, token, balance } = data;
-      // console.log(username,success,token,balance)
+      let { username, balance } = data.data;
+      console.log(username,balance)
+      
 
       dispatch({type:ACTIONS.SET_FORMDATA});
 
       setLoading(false);
-      enqueueSnackbar("logged in successfully", { variant: "success" });
-      if (success) {
-        persistLogin(token, username, balance);
+      
+      if (data.success) {
+        enqueueSnackbar("logged in successfully", { variant: "success" });
+        persistLogin(data.data.username, data.data.balance);
+        dispatchh(loginSuccess())
+        navigate("/");
+      } else {
+        enqueueSnackbar("User not registered", { variant: "error" });
       }
-      navigate("/Products");
+      
     } catch (e) {
       setLoading(false);
       if (e.response && e.response.status === 400) {
@@ -87,8 +97,7 @@ const Login = () => {
     return true;
   };
 
-  const persistLogin = (token, username, balance) => {
-    localStorage.setItem("token", token);
+  const persistLogin = (username, balance) => {
     localStorage.setItem("username", username);
     localStorage.setItem("balance", balance);
   };
@@ -102,6 +111,14 @@ const Login = () => {
     >
       <Header hasHiddenAuthButtons />
       <Box className="content">
+        
+      
+          <form 
+          className="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            login();
+            }}>
         <Stack spacing={2} className="form">
           <h2 className="title">Login</h2>
           <TextField
@@ -136,11 +153,12 @@ const Login = () => {
           </Button>
           <p className="secondary-action">
             Don't have an account?{" "}
-            <Link className="link" to="/">
+            <Link className="link" to="/register">
               Register now
             </Link>
           </p>
         </Stack>
+        </form>
       </Box>
       <Footer />
     </Box>

@@ -60,19 +60,20 @@ const Register = () => {
         type: ACTIONS.SET_DATA,
         payload: { username: "", password: "", confirmPassword: "" },
       });
-
-
-      enqueueSnackbar("Registered Successfully", { variant: "success" });
-      navigate("/login");
+      if(response.ok){
+        const resJson = await response.json();
+        if(resJson.success){
+          enqueueSnackbar("Registered Successfully", { variant: "success" });
+            navigate("/login");
+        } else {
+          enqueueSnackbar("Username not available", { variant: "error" });
+        }
+}
     } catch(e){
         setLoading(false);
-        if(e.response && e.response.status === 400){
-          enqueueSnackbar(e.response.data.message, {variant: 'error'})
-        } else {
           enqueueSnackbar('Something went wrong. Check that the backend is running, reachable and returns valid JSON.', {variant:'error'})
         }
       }
-  };
 
   const validateInput = (data) => {
     if (!data.username) {

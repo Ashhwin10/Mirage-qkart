@@ -3,8 +3,12 @@ import { Avatar, Button, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import React, { useEffect } from "react";
 import "./Header.css";
+import { useNavigate } from "react-router-dom";
+
+
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
+  const navigate = useNavigate();
 
           let removeItem = () =>{
             localStorage.clear();
@@ -24,14 +28,15 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
           className="explore-button"
           startIcon={<ArrowBackIcon />}
           variant="text"
+          onClick={() => navigate("/")}
           
         >
           Back to explore
         </Button> ):!localStorage.username ?(<Box>
-          <Stack direction='row'spacing={1}>
-            <Button >LOGIN</Button>
-            <Button >REGISTER</Button>
-          </Stack>
+          <Stack direction='row' spacing={1}>
+      <Button onClick={() => navigate("/login")}>LOGIN</Button>
+      <Button onClick={() => navigate("/register")}>REGISTER</Button>
+        </Stack>
           </Box>
           ):(
          <div className="username-text">
