@@ -91,6 +91,8 @@ const Products = () => {
       });
   }, [products]);
 
+
+   // fetching the cart data
   const fetchCart = async () => {
     if (loginStatus !== true) return;
     try {
