@@ -26,6 +26,7 @@ const Products = () => {
   const [cartItemList, setCartItemList] = useState([]); //cart list
   const [cartItemId, setCartItemId] = useState([]);
 
+
   // API call for fetching the products.
   const performAPICall = async () => {
     setLoading(true);
@@ -50,12 +51,14 @@ const Products = () => {
   // Implementation of search logic.
   const performSearch = async (text) => {
     let url = `/products/search?value=${text}`;
+    console.log("Search URL:", url);
     try {
       let search = await axios.get(url);
-      setProducts(search.data);
+      console.log(search.data);
+      setProducts(search.data.products);
     } catch (e) {
       if (e.response.status === 404) {
-        setProducts("empty");
+        console.log(e);
       }
     }
   };
@@ -92,7 +95,7 @@ const Products = () => {
   }, [products]);
 
 
-   // fetching the cart data
+  // fetching the cart data
   const fetchCart = async () => {
     if (loginStatus !== true) return;
     try {
