@@ -21,6 +21,7 @@ import "./Checkout.css";
 import Footer from "./Footer";
 import Header from "./Header";
 
+// Function to manage the adding of new address in the checkout page
 const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
   return (
     <Box display="flex" flexDirection="column">
@@ -33,7 +34,7 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
         }}
       />
       <Stack direction="row" my="1rem">
-        <Button variant="contained" onClick={() =>  addAddress(newAddress)}>
+        <Button variant="contained" onClick={() => addAddress(newAddress)}>
           Add
         </Button>
         <Button
@@ -53,10 +54,8 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
 };
 
 const Checkout = () => {
-  const token = localStorage.getItem("token");
-  const username = localStorage.getItem("username");
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [addresses, setAddresses] = useState({ all: [], selected: "" });
@@ -66,7 +65,7 @@ const Checkout = () => {
   });
   const [getAddress, SetGetAddress] = useState([]);
 
-  // Fetch the entire products list
+  // Fetching the entire products list
   const getProducts = async () => {
     try {
       let response = await fetch("/api/products");
@@ -85,7 +84,7 @@ const Checkout = () => {
     }
   };
 
-  // Fetch cart data
+  // Fetching the cart data
   const fetchCart = async () => {
     try {
       const response = await axios.get("/api/cart");
@@ -105,7 +104,7 @@ const Checkout = () => {
     }
   };
 
-  // get address for displaying in the checkout page
+  // get request for displaying the address in the checkout page
   const getAddresses = async () => {
     try {
       const response = await axios.get("/api/checkout/addresses");
@@ -125,7 +124,6 @@ const Checkout = () => {
 
   // Post request to add new address
   const addAddress = async (newAddress) => {
-    
     try {
       let response = await axios.post("/api/checkout/addresses", {
         address: newAddress.value,
@@ -147,13 +145,13 @@ const Checkout = () => {
       }
     }
   };
-  //  request to delete addresses
+  //  Request to delete addresses
   const deleteAddress = async (addressId) => {
     try {
       let url = `/api/checkout/addresses/${addressId}`;
       let response = await axios.delete(url);
       setAddresses({ ...addresses, all: response.data });
-      SetGetAddress(response.data)
+      SetGetAddress(response.data);
       return response.data;
     } catch (e) {
       if (e.response) {
@@ -168,7 +166,6 @@ const Checkout = () => {
       }
     }
   };
-  
 
   // validation of checkout page.
   const validateRequest = (items, addresses) => {
@@ -197,12 +194,13 @@ const Checkout = () => {
     return true;
   };
 
-  const performCheckout = async ( items, addresses) => {
+  // Function to make the final checkout
+  const performCheckout = async (items, addresses) => {
     if (validateRequest(items, addresses)) {
       try {
-        ;
-        const res = await axios.post("/api/finalcheckout",
-          { addressId: addresses.selected , items, addresses} ,
+        const res = await axios.post(
+          "/api/finalcheckout",
+          { addressId: addresses.selected, items, addresses },
           {
             headers: {
               "content-type": "application/json",
@@ -214,7 +212,7 @@ const Checkout = () => {
           localStorage.getItem("balance") - getTotalCartValue(items)
         );
         enqueueSnackbar("Order placed successfully", { variant: "success" });
-          navigate("/thanks");
+        navigate("/thanks");
       } catch (e) {
         if (e.response) {
           enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -245,13 +243,10 @@ const Checkout = () => {
     onLoadHandler();
   }, []);
 
-
-  // To display address after adding
+  // To display address after addinga new one
   useEffect(() => {
     getAddresses();
   }, [getAddress]);
-
-
 
   return (
     <>
@@ -269,9 +264,7 @@ const Checkout = () => {
             </Typography>
             <Divider />
             <Box>
-              {/* TODO: CRIO_TASK_MODULE_CHECKOUT - Display list of addresses and corresponding "Delete" buttons, if present, of which 1 can be selected */}
               {addresses.all.length > 0 ? (
-                
                 addresses.all.map((e) => {
                   return (
                     <Box
@@ -299,7 +292,6 @@ const Checkout = () => {
               )}
             </Box>
 
-            {/* TODO: CRIO_TASK_MODULE_CHECKOUT - Dislay either "Add new address" button or the <AddNewAddressView> component to edit the currently selected address */}
             {newAddress.isAddingNewAddress !== true ? (
               <Button
                 color="primary"

@@ -10,16 +10,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 
+// Function to generate the cart items
 export const generateCartItemsFrom = (cartData, productsData) => {
   if (!cartData) {
     return;
   }
-  // console.log("cartdata",cartData);
-  // console.log("cartdata",typeof(cartData));
-  // console.log('products',productsData);
-  // const result = Object.values(cartData)
-  // console.log(result.length);
-
   let cartItem = [];
   let arr = cartData.cart.items;
   for (let i = 0; i < arr.length; i++) {
@@ -27,13 +22,13 @@ export const generateCartItemsFrom = (cartData, productsData) => {
       if (arr[i].qty > 0 && arr[i].productId === productsData[j].id) {
         productsData[j].qty = arr[i].qty;
         cartItem.push(productsData[j]);
-        
       }
     }
   }
   return cartItem;
 };
 
+// Calculate the cost value of the cart
 export const getTotalCartValue = (items = []) => {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
@@ -44,11 +39,12 @@ export const getTotalCartValue = (items = []) => {
   }
   return total;
 };
-
+//  Get the total items in the cart
 export const getTotalItems = (items = []) => {
   return items.length;
 };
 
+// To increase and decrease the quantity of the products in the cart
 const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   return (
     <Stack direction="row" alignItems="center">
@@ -65,6 +61,7 @@ const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   );
 };
 
+// Function to render the cart
 const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
   const navigate = useNavigate();
   if (items.length === 0) {
@@ -89,14 +86,7 @@ const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
                 padding="1rem"
               >
                 <Box className="image-container">
-                  <img
-                    // Add product image
-                    src={e.image}
-                    // Add product name as alt text
-                    alt={e.name}
-                    width="100%"
-                    height="100%"
-                  />
+                  <img src={e.image} alt={e.name} width="100%" height="100%" />
                 </Box>
 
                 <Box
@@ -175,9 +165,7 @@ const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
                 startIcon={<ShoppingCart />}
                 className="checkout-btn"
                 onClick={() => {
-                  // history.push("/Checkout");
-                  navigate('/checkout');
-                  // window.scrollTo(0, 0);
+                  navigate("/checkout");
                 }}
               >
                 Checkout

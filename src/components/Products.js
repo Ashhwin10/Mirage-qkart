@@ -21,11 +21,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Products = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [products, setProducts] = useState([]); //all products list
-  const [loading, setLoading] = useState(false);
-  const [cartItemList, setCartItemList] = useState([]); //cart list
-  const [cartItemId, setCartItemId] = useState([]);
-
+  const [products, setProducts] = useState([]); //State for the products list
+  const [loading, setLoading] = useState(false); // State to update the Loading status
+  const [cartItemList, setCartItemList] = useState([]); // State for the cart list
 
   // API call for fetching the products.
   const performAPICall = async () => {
@@ -51,10 +49,8 @@ const Products = () => {
   // Implementation of search logic.
   const performSearch = async (text) => {
     let url = `/products/search?value=${text}`;
-    console.log("Search URL:", url);
     try {
       let search = await axios.get(url);
-      console.log(search.data);
       setProducts(search.data.products);
     } catch (e) {
       if (e.response.status === 404) {
@@ -93,7 +89,6 @@ const Products = () => {
         return setCartItemList(cartItem);
       });
   }, [products]);
-
 
   // fetching the cart data
   const fetchCart = async () => {
@@ -159,7 +154,6 @@ const Products = () => {
       });
       const data = response.data;
       const nCartItemList = generateCartItemsFrom(data, products);
-      setCartItemId(data);
       setCartItemList(nCartItemList);
     } catch (e) {
       console.log(e);

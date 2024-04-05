@@ -9,8 +9,9 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import "./ProductCard.css"; 
+import "./ProductCard.css";
 
+// Product card from mui
 const ProductCard = ({ product, handleAddToCart }) => {
   return (
     <Card className="card">

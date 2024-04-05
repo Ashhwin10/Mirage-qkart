@@ -11,17 +11,16 @@ const Thanks = () => {
   const navigate = useNavigate();
 
   const routeToProducts = () => {
-    navigate("/")
+    navigate("/");
   };
-
-  const clearCart = async() => {
-    try{
-        const response = await axios.post("/api/clearcart");
-    }catch(e){
-        console.log(e)
+  // Function to clear the cart after placing an order.
+  const clearCart = async () => {
+    try {
+      const response = await axios.post("/api/clearcart");
+    } catch (e) {
+      console.log(e);
     }
-
-  }
+  };
 
   return (
     <>
@@ -36,7 +35,10 @@ const Thanks = () => {
           variant="contained"
           size="large"
           id="continue-btn"
-          onClick={() => { clearCart(); routeToProducts(); }}
+          onClick={() => {
+            clearCart();
+            routeToProducts();
+          }}
         >
           Continue Shopping
         </Button>

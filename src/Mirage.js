@@ -13,8 +13,11 @@ export function MirageSetup() {
     },
 
     seeds(server) {
+      // Test user login details
       server.create("user", { username: "testuser", password: "11111111" });
 
+
+      // Products data
       const productData = [ 
         {
           id: 1,
@@ -112,6 +115,7 @@ export function MirageSetup() {
     
 
     routes() {
+
       // Post request for register page
       this.post("/api/register", (schema, request) => {
         const requestData = JSON.parse(request.requestBody);
@@ -141,7 +145,6 @@ export function MirageSetup() {
       this.post("/api/login", (schema, request) => {
         const requestData = JSON.parse(request.requestBody);
         const { username, password } = requestData;
-
         const user = schema.users.findBy({ username, password });
        
         let balance = 5000;
@@ -175,7 +178,6 @@ export function MirageSetup() {
         const products = schema.db.products.where((product) =>
           product.name.toLowerCase().includes(value.toLowerCase())
         );
-        console.log(products);
         return { products };
       });
 
@@ -205,7 +207,6 @@ export function MirageSetup() {
             items: [...cart.items, { productId, name, qty }],
           });
         }
-
         return cart;
       });
 
@@ -220,9 +221,9 @@ export function MirageSetup() {
         const requestData = JSON.parse(request.requestBody);
         const { address } = requestData;
         const createdAddress = schema.addresses.create({ address });
-
         return createdAddress;
       });
+
 
       // get request to fetch and display the addresses
       this.get("/api/checkout/addresses", (schema, request) => {
@@ -230,12 +231,14 @@ export function MirageSetup() {
         return addresses;
       });
 
+
       // post request to delete the addresses
       this.delete("/api/checkout/addresses/:id", (schema, request) => {
         let addressId = request.params.id;
         let address = schema.addresses.find(addressId);
         address.destroy(addressId);
       });
+
 
       // Post request for checkout
       this.post("/api/finalcheckout", (schema, request) => {
@@ -245,6 +248,8 @@ export function MirageSetup() {
         console.log(" final Checkout Data", finalData);
         return finalData;
       });
+
+
       // Post call to clear the cart after checkout
       this.post("/api/clearcart", (schema, request) => {
         const cart = schema.carts.first();

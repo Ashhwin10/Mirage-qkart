@@ -8,11 +8,12 @@ import "./Register.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-
+// Actions for reducer fuction
 const ACTIONS = {
   SET_DATA: "set-data",
 };
 
+// Reducer function
 function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_DATA:
@@ -25,33 +26,30 @@ function reducer(state, action) {
 const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const [loading, setLoading] = React.useState(false);
-
-
+  const [loading, setLoading] = React.useState(false); // State to update the Loading status
   const [state, dispatch] = useReducer(reducer, {
     username: "",
     password: "",
     confirmPassword: "",
-  });
+  }); // State for the Registration input
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     dispatch({ type: ACTIONS.SET_DATA, payload: { [name]: value } });
   };
-
+  // Post request for registering an user
   const register = async () => {
     const { username, password, confirmPassword } = state;
     if (!validateInput(state)) {
       return;
     }
-
     try {
       setLoading(true);
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-          },
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ username, password }),
       });
       setLoading(false);
@@ -60,21 +58,25 @@ const Register = () => {
         type: ACTIONS.SET_DATA,
         payload: { username: "", password: "", confirmPassword: "" },
       });
-      if(response.ok){
+      if (response.ok) {
         const resJson = await response.json();
-        if(resJson.success){
+        if (resJson.success) {
           enqueueSnackbar("Registered Successfully", { variant: "success" });
-            navigate("/login");
+          navigate("/login");
         } else {
           enqueueSnackbar("Username not available", { variant: "error" });
         }
-}
-    } catch(e){
-        setLoading(false);
-          enqueueSnackbar('Something went wrong. Check that the backend is running, reachable and returns valid JSON.', {variant:'error'})
-        }
       }
+    } catch (e) {
+      setLoading(false);
+      enqueueSnackbar(
+        "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
+        { variant: "error" }
+      );
+    }
+  };
 
+  // Register page  input validation
   const validateInput = (data) => {
     if (!data.username) {
       enqueueSnackbar("Username is a required field", { variant: "warning" });
@@ -165,11 +167,11 @@ const Register = () => {
               </Button>
             )}
             <p className="secondary-action">
-            Already have an account?{" "}
-            <Link className="link" to="/login">
-              Login here
-            </Link>
-          </p>
+              Already have an account?{" "}
+              <Link className="link" to="/login">
+                Login here
+              </Link>
+            </p>
           </Stack>
         </form>
       </Box>
