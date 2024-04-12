@@ -46,6 +46,7 @@ const Products = () => {
     }
   };
 
+
   // Implementation of search logic.
   const performSearch = async (text) => {
     let url = `/products/search?value=${text}`;

@@ -243,7 +243,7 @@ const Checkout = () => {
     onLoadHandler();
   }, []);
 
-  // To display address after addinga new one
+  // To display address after adding a new one
   useEffect(() => {
     getAddresses();
   }, [getAddress]);
