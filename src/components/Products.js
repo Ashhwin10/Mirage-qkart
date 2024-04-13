@@ -78,8 +78,9 @@ const Products = () => {
 
   useEffect(() => {
     performAPICall();
-  }, []);
 
+  }, []);
+  
   // use effect to set the cartItems
   useEffect(() => {
     fetchCart()
@@ -97,6 +98,7 @@ const Products = () => {
     try {
       const response = await axios.get("/api/cart");
       return response.data;
+      
     } catch (e) {
       if (e.response && e.response.status === 400) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -163,8 +165,9 @@ const Products = () => {
 
   return (
     <div>
-      <Header>
+      <Header className = "searchBox">
         <TextField
+        id="1122"
           className="search-desktop"
           fullWidth
           size="small"
