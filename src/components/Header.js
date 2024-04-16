@@ -29,14 +29,15 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
           startIcon={<ArrowBackIcon />}
           variant="text"
           onClick={() => navigate("/")}
+          data-cy="Explore-header"
         >
           Back to explore
         </Button>
       ) : !localStorage.username ? (
         <Box>
           <Stack direction="row" spacing={1}>
-            <Button onClick={() => navigate("/login")}>LOGIN</Button>
-            <Button onClick={() => navigate("/register")}>REGISTER</Button>
+            <Button  data-cy="Login-header" onClick={() => navigate("/login")}>LOGIN</Button>
+            <Button   data-cy="Register-header" onClick={() => navigate("/register")}>REGISTER</Button>
           </Stack>
         </Box>
       ) : (
@@ -44,7 +45,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
           <Stack direction="row" spacing={1}>
             <Avatar src="avatar.png" alt={localStorage.username} />
             <div className="username">{localStorage.username}</div>
-            <Button className="logoutbutton" onClick={removeItem}>
+            <Button data-cy="Logout-header" className="logoutbutton" onClick={removeItem}>
               LOGOUT
             </Button>
           </Stack>

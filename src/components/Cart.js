@@ -48,13 +48,13 @@ export const getTotalItems = (items = []) => {
 const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   return (
     <Stack direction="row" alignItems="center">
-      <IconButton size="small" color="primary" onClick={handleDelete}>
+      <IconButton size="small" color="primary" onClick={handleDelete}  data-cy="remove">
         <RemoveOutlined />
       </IconButton>
-      <Box padding="0.5rem" data-testid="item-qty" className="cart-item">
+      <Box padding="0.5rem" data-testid="item-qty" className="cart-item"  data-cy="qty-value">
         {value}
       </Box>
-      <IconButton size="small" color="primary" onClick={handleAdd}>
+      <IconButton size="small" color="primary" onClick={handleAdd}  data-cy="add">
         <AddOutlined />
       </IconButton>
     </Stack>
@@ -164,6 +164,7 @@ const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
                 variant="contained"
                 startIcon={<ShoppingCart />}
                 className="checkout-btn"
+                data-cy="checkout"
                 onClick={() => {
                   navigate("/checkout");
                 }}

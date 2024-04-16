@@ -170,6 +170,7 @@ const Products = () => {
         id="1122"
           className="search-desktop"
           fullWidth
+          data-cy="searchbox"
           size="small"
           sx={{ width: "35%" }}
           InputProps={{
@@ -190,6 +191,7 @@ const Products = () => {
         className="search-mobile"
         size="small"
         fullWidth
+        data-cy="searchbox"
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -264,6 +266,7 @@ const Products = () => {
           <Grid
             container
             item
+            data-cy="Cart-details"
             className="product-grid"
             xs={12}
             md={3}

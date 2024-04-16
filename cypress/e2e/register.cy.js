@@ -35,8 +35,8 @@ describe(" username already existing", () => {
     register.enterConfirmPassword();
     register.clickRegister();
     cy.wait(500)
-    cy.get(".header > .MuiButtonBase-root").click();
-    cy.get(".MuiStack-root > :nth-child(2)").click();
+    cy.get('[data-cy="Explore-header"]').click()
+    cy.get('[data-cy="Register-header"]').click()
     register.enterUsername();
     register.enterPassword();
     register.enterConfirmPassword();

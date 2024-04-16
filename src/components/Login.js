@@ -134,6 +134,7 @@ const Login = () => {
               className="button"
               variant="contained"
               onClick={() => login(state)}
+              data-cy="Login"
             >
               LOGIN TO QKART
             </Button>

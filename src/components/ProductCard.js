@@ -36,6 +36,7 @@ const ProductCard = ({ product, handleAddToCart }) => {
           fullWidth
           variant="contained"
           onClick={handleAddToCart}
+          data-cy="add-to-cart-button" 
         >
           <AddShoppingCartOutlined />
           ADD TO CART

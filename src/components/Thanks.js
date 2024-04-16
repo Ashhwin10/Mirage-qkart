@@ -35,6 +35,7 @@ const Thanks = () => {
           variant="contained"
           size="large"
           id="continue-btn"
+          data-cy="Continue Shopping"
           onClick={() => {
             clearCart();
             routeToProducts();

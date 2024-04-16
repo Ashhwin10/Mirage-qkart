@@ -26,6 +26,7 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
   return (
     <Box display="flex" flexDirection="column">
       <TextField
+       data-cy="address-textbox"
         multiline
         minRows={4}
         placeholder="Enter your complete address"
@@ -34,7 +35,7 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
         }}
       />
       <Stack direction="row" my="1rem">
-        <Button variant="contained" onClick={() => addAddress(newAddress)}>
+        <Button data-cy="add-new-btn" variant="contained" onClick={() => addAddress(newAddress)}>
           Add
         </Button>
         <Button
@@ -268,6 +269,7 @@ const Checkout = () => {
                 addresses.all.map((e) => {
                   return (
                     <Box
+                    data-cy="select-address"
                       className={`address-item ${
                         addresses.selected === e.id
                           ? `selected`
@@ -279,7 +281,8 @@ const Checkout = () => {
                       key={e.id}
                     >
                       <Typography>{e.address}</Typography>
-                      <Button onClick={() => deleteAddress(e.id)}>
+                      <Button  data-cy="delete-address" onClick={() => deleteAddress(e.id)
+                    }>
                         Delete
                       </Button>
                     </Box>
@@ -334,6 +337,7 @@ const Checkout = () => {
               startIcon={<CreditCard />}
               variant="contained"
               onClick={(e) => performCheckout(items, addresses)}
+              data-cy="place-order"
             >
               PLACE ORDER
             </Button>
