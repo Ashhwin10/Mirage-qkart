@@ -1,4 +1,4 @@
-import { Search, SentimentDissatisfied } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import {
   CircularProgress,
   Grid,
@@ -9,36 +9,36 @@ import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../Footer/Footer.js";
+import Header from "../Header/Header.js";
 import "./Products.css";
-import ProductCard from "./ProductCard";
+import ProductCard from "../Productcard/ProductCard.js";
 import { Typography } from "@mui/material";
-import Cart, { generateCartItemsFrom } from "./Cart";
-import "./Cart.css";
-import { loginSuccess } from "../redux/reduxSlice.js";
+import Cart, { generateCartItemsFrom } from "../Cart/Cart.js";
+import "../Cart/Cart.css";
+import { loginSuccess } from "../../redux/login/loginSlice.js";
+import { setProducts } from "../../redux/products/products.js";
+import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
+import { setCartProducts } from "../../redux/cart/cart.js";
 import { useDispatch, useSelector } from "react-redux";
+
 
 const Products = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const [products, setProducts] = useState([]); //State for the products list
-  const [loading, setLoading] = useState(false); // State to update the Loading status
-  const [cartItemList, setCartItemList] = useState([]); // State for the cart list
+  const dispatch = useDispatch();
+  const [searching, setsearching] = useState(false);
+  const isLoading = useSelector((state) => state.isLoading.isLoading);
+  const products = useSelector((state) => state.products.products);
+  const cartItemList = useSelector((state) => state.cartProducts.cartItemList);
+  const loginStatus = useSelector((state) => state.loginStatus.isLoggedIn);
 
-  // API call for fetching the products.
   const performAPICall = async () => {
-    setLoading(true);
+    dispatch(isLoadingTrue());
     try {
-      let response = await fetch("/api/products");
-      if (!response.ok) {
-        throw new Error("Failed to fetch products");
-      }
-      let data = await response.json();
-      setProducts(data.products);
-      setLoading(false);
-      return data.products;
+      const { data } = await axios.get("/api/products");
+      dispatch(setProducts(data.products));
+      dispatch(isLoadingFalse());
     } catch (e) {
-      // setLoading(false);
       enqueueSnackbar(
         "Something went wrong in fetching of products Check that the backend is running, reachable and returns valid JSON.",
         { variant: "error" }
@@ -46,13 +46,11 @@ const Products = () => {
     }
   };
 
-
-  // Implementation of search logic.
   const performSearch = async (text) => {
     let url = `/products/search?value=${text}`;
     try {
-      let search = await axios.get(url);
-      setProducts(search.data.products);
+      let { data } = await axios.get(url);
+      dispatch(setProducts(data.products));
     } catch (e) {
       if (e.response.status === 404) {
         console.log(e);
@@ -60,45 +58,24 @@ const Products = () => {
     }
   };
 
-  //Debouncing for search functionality
-
   const debounceSearch = (event, debounceTimeout) => {
     let newtimeout;
+    setsearching(true);
     clearTimeout(newtimeout);
     newtimeout = setTimeout(() => {
       performSearch(event.target.value);
+      setsearching(false);
     }, debounceTimeout);
   };
 
-  // isLogged in status from redux
-  const isLoggedIn = useSelector(loginSuccess);
-  let loginStatus = isLoggedIn.payload.loginStatus.isLoggedIn;
+ 
 
-  // Use effect for fetching the products when the page renders
-
-  useEffect(() => {
-    performAPICall();
-
-  }, []);
-  
-  // use effect to set the cartItems
-  useEffect(() => {
-    fetchCart()
-      .then((result) => {
-        return generateCartItemsFrom(result, products);
-      })
-      .then((cartItem) => {
-        return setCartItemList(cartItem);
-      });
-  }, [products]);
-
-  // fetching the cart data
+ 
   const fetchCart = async () => {
     if (loginStatus !== true) return;
     try {
-      const response = await axios.get("/api/cart");
-      return response.data;
-      
+      const { data } = await axios.get("/api/cart");
+      return data;
     } catch (e) {
       if (e.response && e.response.status === 400) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -114,7 +91,7 @@ const Products = () => {
     }
   };
 
-  // Return if a product already exists in the cart
+
 
   const isItemInCart = (items, productId) => {
     if (!items) return;
@@ -149,25 +126,43 @@ const Products = () => {
       return;
     }
     try {
-      const response = await axios.post("/api/cart", {
+      const { data } = await axios.post("/api/cart", {
         productId,
         qty,
         id,
         name,
       });
-      const data = response.data;
+      // const data = response.data;
+
       const nCartItemList = generateCartItemsFrom(data, products);
-      setCartItemList(nCartItemList);
+      // setCartItemList(nCartItemList);
+      dispatch(setCartProducts(nCartItemList));
     } catch (e) {
       console.log(e);
     }
   };
+  
+
+  useEffect(() => {
+    performAPICall();
+  }, []);
+
+  
+  useEffect(() => {
+    fetchCart()
+      .then((result) => {
+        return generateCartItemsFrom(result, products);
+      })
+      .then((cartItems) => {
+       dispatch(setCartProducts(cartItems));
+      });
+  }, [products]);
 
   return (
     <div>
-      <Header className = "searchBox">
+      <Header className="searchBox">
         <TextField
-        id="1122"
+          id="1122"
           className="search-desktop"
           fullWidth
           data-cy="searchbox"
@@ -176,7 +171,13 @@ const Products = () => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <Search color="primary" />
+                <React.Fragment>
+                  {searching ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <Search color="primary" />
+                  )}
+                </React.Fragment>
               </InputAdornment>
             ),
           }}
@@ -214,7 +215,7 @@ const Products = () => {
           {/* <ProductCard /> */}
 
           <Grid container>
-            {loading === true ? (
+            {isLoading === true ? (
               <Box
                 display="flex"
                 flexDirection="column"

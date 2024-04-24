@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Register from "./components/Register";
-import Login from "./components/Login";
-import { MirageSetup } from "./Mirage.js";
-import Products from "./components/Products";
-import Checkout from "./components/checkout";
-import Thanks from "./components/Thanks";
+import Register from "./components/Register/Register.js";
+import Login from "./components/Login/Login.js";
+import { MirageSetup } from "./mirage/mirage.js";
+import Products from "./components/Products/Products.js";
+import Checkout from "./components/Checkout/Checkout.js";
+import Thanks from "./components/Thanks/Thanks.js";
 
 
 MirageSetup();

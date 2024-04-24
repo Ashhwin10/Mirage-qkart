@@ -2,8 +2,8 @@ import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../Footer/Footer";
+import Header from "../Header/Header";
 import "./Thanks.css";
 import axios from "axios";
 
@@ -16,7 +16,7 @@ const Thanks = () => {
   // Function to clear the cart after placing an order.
   const clearCart = async () => {
     try {
-      const response = await axios.post("/api/clearcart");
+      const {data} = await axios.post("/api/clearcart");
     } catch (e) {
       console.log(e);
     }

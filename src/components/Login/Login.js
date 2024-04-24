@@ -1,14 +1,15 @@
-import { Button, CircularProgress, Stack, TextField } from "@mui/material";
+import { Button,Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useSnackbar } from "notistack";
-import React, { useState, useReducer } from "react";
-import { useHistory, Link } from "react-router-dom";
+import React, {  useReducer } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../Footer/Footer.js";
+import Header from "../Header/Header.js";
 import "./Login.css";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "../redux/reduxSlice.js";
+import { loginSuccess } from "../../redux/login/loginSlice.js";
+import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
 
 // Actions for reducer fuction
 const ACTIONS = {
@@ -28,7 +29,6 @@ const Login = () => {
   const dispatchh = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [loading, setLoading] = useState(false); //State to update the Loading status
   const [state, dispatch] = useReducer(reducer, { username: "", password: "" }); // State for the login user input
 
   const handleChange = (event) => {
@@ -40,7 +40,7 @@ const Login = () => {
   const login = async (formData) => {
     if (!validateInput(formData)) return;
     try {
-      setLoading(true);
+      dispatchh(isLoadingTrue());
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
@@ -53,8 +53,7 @@ const Login = () => {
       let { username, balance } = data.data;
 
       dispatch({ type: ACTIONS.SET_FORMDATA });
-
-      setLoading(false);
+      dispatchh(isLoadingFalse());
 
       if (data.success) {
         enqueueSnackbar("logged in successfully", { variant: "success" });
@@ -65,7 +64,7 @@ const Login = () => {
         enqueueSnackbar("User not registered", { variant: "error" });
       }
     } catch (e) {
-      setLoading(false);
+      dispatchh(isLoadingFalse());
       enqueueSnackbar("Invalid username or password", { variant: "error" });
     }
   };

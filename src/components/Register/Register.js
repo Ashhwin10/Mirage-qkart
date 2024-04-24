@@ -2,15 +2,17 @@ import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useSnackbar } from "notistack";
 import React, { useReducer } from "react";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../Footer/Footer";
+import Header from "../Header/Header";
 import "./Register.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
+import { isLoadingFalse, isLoadingTrue } from "../../redux/loading/loading";
+import { useSelector, useDispatch } from "react-redux";
 // Actions for reducer fuction
 const ACTIONS = {
   SET_DATA: "set-data",
+  CLEAR_DATA: "clear-data",
 };
 
 // Reducer function
@@ -18,15 +20,18 @@ function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_DATA:
       return { ...state, ...action.payload };
+    case ACTIONS.CLEAR_DATA:
+      return { username: "", password: "", confirmPassword: "" };
     default:
       return state;
   }
 }
 
 const Register = () => {
+  const dispatchh = useDispatch();
+  const loading = useSelector((state)=> state.isLoading.isLoading)
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const [loading, setLoading] = React.useState(false); // State to update the Loading status
   const [state, dispatch] = useReducer(reducer, {
     username: "",
     password: "",
@@ -44,7 +49,7 @@ const Register = () => {
       return;
     }
     try {
-      setLoading(true);
+      dispatchh(isLoadingTrue())
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
@@ -52,11 +57,10 @@ const Register = () => {
         },
         body: JSON.stringify({ username, password }),
       });
-      setLoading(false);
+      dispatchh(isLoadingFalse())
 
       dispatch({
-        type: ACTIONS.SET_DATA,
-        payload: { username: "", password: "", confirmPassword: "" },
+        type: ACTIONS.CLEAR_DATA
       });
       if (response.ok) {
         const resJson = await response.json();
@@ -68,7 +72,7 @@ const Register = () => {
         }
       }
     } catch (e) {
-      setLoading(false);
+      dispatchh(isLoadingFalse())
       enqueueSnackbar(
         "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
         { variant: "error" }

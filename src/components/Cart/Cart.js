@@ -8,43 +8,54 @@ import { Button, IconButton, Stack } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Cart.css";
+import "./Cart.js";
 
 // Function to generate the cart items
 export const generateCartItemsFrom = (cartData, productsData) => {
   if (!cartData) {
-    return;
+    return [];
   }
-  let cartItem = [];
-  let arr = cartData.cart.items;
-  for (let i = 0; i < arr.length; i++) {
+
+  const cartItems = [];
+  const cartArray = cartData.cart.items;
+
+  for (let i = 0; i < cartArray.length; i++) {
     for (let j = 0; j < productsData.length; j++) {
-      if (arr[i].qty > 0 && arr[i].productId === productsData[j].id) {
-        productsData[j].qty = arr[i].qty;
-        cartItem.push(productsData[j]);
+      const cartProduct = cartArray[i];
+      const product = productsData[j];
+
+      if (cartProduct.qty > 0 && cartProduct.productId === product.id) {
+      
+        const cartItem = { ...product, qty: cartProduct.qty };
+
+       
+        cartItems.push(cartItem);
       }
     }
   }
-  return cartItem;
+
+  return cartItems;
 };
 
-// Calculate the cost value of the cart
+
+
 export const getTotalCartValue = (items = []) => {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
-    let totalQty = items[i].qty;
-    let totalCost = items[i].price;
+    const totalQty = items[i].qty;
+    const totalCost = items[i].price;
     let totalValue = totalCost * totalQty;
     total += totalValue;
   }
   return total;
 };
-//  Get the total items in the cart
+
+
 export const getTotalItems = (items = []) => {
   return items.length;
 };
 
-// To increase and decrease the quantity of the products in the cart
+
 const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   return (
     <Stack direction="row" alignItems="center">
@@ -61,7 +72,7 @@ const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   );
 };
 
-// Function to render the cart
+
 const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
   const navigate = useNavigate();
   if (items.length === 0) {

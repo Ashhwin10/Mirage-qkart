@@ -1,4 +1,4 @@
-import { CreditCard, Delete } from "@mui/icons-material";
+import { CreditCard } from "@mui/icons-material";
 import {
   Button,
   Divider,
@@ -16,17 +16,17 @@ import Cart, {
   getTotalCartValue,
   generateCartItemsFrom,
   getTotalItems,
-} from "./Cart";
+} from "../Cart/Cart";
 import "./Checkout.css";
-import Footer from "./Footer";
-import Header from "./Header";
+import Footer from "../Footer/Footer";
+import Header from "../Header/Header";
 
-// Function to manage the adding of new address in the checkout page
+
 const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
   return (
     <Box display="flex" flexDirection="column">
       <TextField
-       data-cy="address-textbox"
+        data-cy="address-textbox"
         multiline
         minRows={4}
         placeholder="Enter your complete address"
@@ -35,7 +35,11 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
         }}
       />
       <Stack direction="row" my="1rem">
-        <Button data-cy="add-new-btn" variant="contained" onClick={() => addAddress(newAddress)}>
+        <Button
+          data-cy="add-new-btn"
+          variant="contained"
+          onClick={() => addAddress(newAddress)}
+        >
           Add
         </Button>
         <Button
@@ -66,16 +70,11 @@ const Checkout = () => {
   });
   const [getAddress, SetGetAddress] = useState([]);
 
-  // Fetching the entire products list
+ 
   const getProducts = async () => {
     try {
-      let response = await fetch("/api/products");
-      if (!response.ok) {
-        throw new Error("Failed to fetch products");
-      }
-      let data = await response.json();
-      setProducts(data.products);
-
+      const { data } = await axios.get("/api/products");
+      setProducts(data);
       return data.products;
     } catch (e) {
       enqueueSnackbar(
@@ -85,11 +84,11 @@ const Checkout = () => {
     }
   };
 
-  // Fetching the cart data
+ 
   const fetchCart = async () => {
     try {
-      const response = await axios.get("/api/cart");
-      return response.data;
+      const { data } = await axios.get("/api/cart");
+      return data;
     } catch (e) {
       if (e.response && e.response.status === 400) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -105,13 +104,12 @@ const Checkout = () => {
     }
   };
 
-  // get request for displaying the address in the checkout page
+  
   const getAddresses = async () => {
     try {
-      const response = await axios.get("/api/checkout/addresses");
+      const { data } = await axios.get("/api/checkout/addresses");
 
-      setAddresses({ ...addresses, all: response.data });
-      return response.data;
+      setAddresses({ ...addresses, all: data });
     } catch {
       enqueueSnackbar(
         "Could not fetch addresses. Check that the backend is running, reachable and returns valid JSON.",
@@ -123,16 +121,14 @@ const Checkout = () => {
     }
   };
 
-  // Post request to add new address
+  
   const addAddress = async (newAddress) => {
     try {
-      let response = await axios.post("/api/checkout/addresses", {
+      const { data } = await axios.post("/api/checkout/addresses", {
         address: newAddress.value,
       });
-      setAddresses({ ...addresses, all: response.data });
-      SetGetAddress(response.data);
-
-      return response.data.addresses;
+      setAddresses({ ...addresses, all: data });
+      SetGetAddress(data);
     } catch (e) {
       if (e.response) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -146,14 +142,13 @@ const Checkout = () => {
       }
     }
   };
-  //  Request to delete addresses
+  
   const deleteAddress = async (addressId) => {
     try {
-      let url = `/api/checkout/addresses/${addressId}`;
-      let response = await axios.delete(url);
-      setAddresses({ ...addresses, all: response.data });
-      SetGetAddress(response.data);
-      return response.data;
+      const url = `/api/checkout/addresses/${addressId}`;
+      const { data } = await axios.delete(url);
+      setAddresses({ ...addresses, all: data });
+      SetGetAddress(data);
     } catch (e) {
       if (e.response) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -168,7 +163,7 @@ const Checkout = () => {
     }
   };
 
-  // validation of checkout page.
+  
   const validateRequest = (items, addresses) => {
     if (localStorage.getItem("balance") < getTotalCartValue(items)) {
       enqueueSnackbar(
@@ -195,13 +190,13 @@ const Checkout = () => {
     return true;
   };
 
-  // Function to make the final checkout
+  
   const performCheckout = async (items, addresses) => {
     if (validateRequest(items, addresses)) {
       try {
-        const res = await axios.post(
+        const { data } = await axios.post(
           "/api/finalcheckout",
-          { addressId: addresses.selected, items, addresses },
+          { items, addresses },
           {
             headers: {
               "content-type": "application/json",
@@ -229,7 +224,7 @@ const Checkout = () => {
     }
   };
 
-  // Fetch products and cart data on page load
+  
   useEffect(() => {
     const onLoadHandler = async () => {
       const productsData = await getProducts();
@@ -244,7 +239,7 @@ const Checkout = () => {
     onLoadHandler();
   }, []);
 
-  // To display address after adding a new one
+  
   useEffect(() => {
     getAddresses();
   }, [getAddress]);
@@ -269,7 +264,7 @@ const Checkout = () => {
                 addresses.all.map((e) => {
                   return (
                     <Box
-                    data-cy="select-address"
+                      data-cy="select-address"
                       className={`address-item ${
                         addresses.selected === e.id
                           ? `selected`
@@ -281,8 +276,10 @@ const Checkout = () => {
                       key={e.id}
                     >
                       <Typography>{e.address}</Typography>
-                      <Button  data-cy="delete-address" onClick={() => deleteAddress(e.id)
-                    }>
+                      <Button
+                        data-cy="delete-address"
+                        onClick={() => deleteAddress(e.id)}
+                      >
                         Delete
                       </Button>
                     </Box>
