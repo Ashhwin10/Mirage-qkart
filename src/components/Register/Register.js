@@ -9,13 +9,13 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { isLoadingFalse, isLoadingTrue } from "../../redux/loading/loading";
 import { useSelector, useDispatch } from "react-redux";
-// Actions for reducer fuction
+
 const ACTIONS = {
   SET_DATA: "set-data",
   CLEAR_DATA: "clear-data",
 };
 
-// Reducer function
+
 function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_DATA:
@@ -36,13 +36,13 @@ const Register = () => {
     username: "",
     password: "",
     confirmPassword: "",
-  }); // State for the Registration input
+  }); 
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     dispatch({ type: ACTIONS.SET_DATA, payload: { [name]: value } });
   };
-  // Post request for registering an user
+  
   const register = async () => {
     const { username, password, confirmPassword } = state;
     if (!validateInput(state)) {
@@ -62,6 +62,7 @@ const Register = () => {
       dispatch({
         type: ACTIONS.CLEAR_DATA
       });
+
       if (response.ok) {
         const resJson = await response.json();
         if (resJson.success) {
@@ -80,7 +81,6 @@ const Register = () => {
     }
   };
 
-  // Register page  input validation
   const validateInput = (data) => {
     if (!data.username) {
       enqueueSnackbar("Username is a required field", { variant: "warning" });

@@ -5,7 +5,6 @@ import React, { useEffect } from "react";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 
-// Header of the page
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
   const navigate = useNavigate();

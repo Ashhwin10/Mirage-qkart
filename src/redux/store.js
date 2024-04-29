@@ -3,12 +3,14 @@ import loginStatusReducer from "./login/loginSlice.js";
 import productsReducer from "./products/products.js"
 import loadingReducer from "./loading/loading.js"
 import cartReducer from "./cart/cart.js"
+import addressReducer from "./addresses/addresses.js"
 
 export const store = configureStore({
   reducer: {
-    loginStatus: loginStatusReducer,
+    isLoggedIn: loginStatusReducer,
     products:productsReducer,
     isLoading:loadingReducer,
-    cartProducts:cartReducer
+    cartItemList:cartReducer,
+    address:addressReducer
   },
 });

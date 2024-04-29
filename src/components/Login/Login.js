@@ -11,12 +11,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../redux/login/loginSlice.js";
 import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
 
-// Actions for reducer fuction
+
+
 const ACTIONS = {
   SET_FORMDATA: "set-formdata",
 };
 
-// Reducer function
+
 function reducer(state, action) {
   switch (action.type) {
     case ACTIONS.SET_FORMDATA:
@@ -30,13 +31,12 @@ const Login = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [state, dispatch] = useReducer(reducer, { username: "", password: "" }); // State for the login user input
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     dispatch({ type: ACTIONS.SET_FORMDATA, payload: { [name]: value } });
   };
 
-  //  Post call for Login functionality
+  
   const login = async (formData) => {
     if (!validateInput(formData)) return;
     try {
@@ -69,7 +69,7 @@ const Login = () => {
     }
   };
 
-  // Input Validation for the login page
+  
   const validateInput = (data) => {
     if (data.username === "") {
       enqueueSnackbar("username is a required field", { variant: "warning" });
@@ -82,7 +82,7 @@ const Login = () => {
     return true;
   };
 
-  //  set the Local storage after login
+ 
   const persistLogin = (username, balance) => {
     localStorage.setItem("username", username);
     localStorage.setItem("balance", balance);

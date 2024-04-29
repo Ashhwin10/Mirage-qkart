@@ -4,9 +4,9 @@ export const loadingSlice = createSlice({
   name: "isLoading",
   initialState: { isLoading: false },
   reducers: {
-    isLoadingTrue: (state, action) => {
-      state.isLoading = true;
-    },isLoadingFalse: (state, action) => {
+    isLoadingTrue: (state) => {
+      state.isLoading = true;//
+    },isLoadingFalse: (state) => {
         state.isLoading = false;
       },
   },

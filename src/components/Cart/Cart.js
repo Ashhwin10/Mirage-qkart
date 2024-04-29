@@ -9,34 +9,8 @@ import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.js";
-
-// Function to generate the cart items
-export const generateCartItemsFrom = (cartData, productsData) => {
-  if (!cartData) {
-    return [];
-  }
-
-  const cartItems = [];
-  const cartArray = cartData.cart.items;
-
-  for (let i = 0; i < cartArray.length; i++) {
-    for (let j = 0; j < productsData.length; j++) {
-      const cartProduct = cartArray[i];
-      const product = productsData[j];
-
-      if (cartProduct.qty > 0 && cartProduct.productId === product.id) {
-      
-        const cartItem = { ...product, qty: cartProduct.qty };
-
-       
-        cartItems.push(cartItem);
-      }
-    }
-  }
-
-  return cartItems;
-};
-
+import { setProducts } from "../../redux/products/products.js";
+import { useSelector } from "react-redux";
 
 
 export const getTotalCartValue = (items = []) => {
@@ -73,7 +47,10 @@ const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
 };
 
 
-const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
+const Cart = ({ items = [], handleQuantity, isReadOnly }) => {
+
+  const {products} = useSelector((state) => state.products)
+  
   const navigate = useNavigate();
   if (items.length === 0) {
     return (
@@ -88,11 +65,11 @@ const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
     return (
       <>
         <Box className="cart">
-          {items.map((e, inx) => {
+          {items.map((e, key) => {
             return (
               <Box
                 display="flex"
-                key={inx}
+                key={key}
                 alignItems="flex-start"
                 padding="1rem"
               >

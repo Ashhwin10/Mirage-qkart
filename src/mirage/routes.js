@@ -1,5 +1,4 @@
 
-
 export function routes() {
   this.post("/api/register", (schema, request) => {
     const requestData = JSON.parse(request.requestBody);

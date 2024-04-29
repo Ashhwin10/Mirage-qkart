@@ -12,17 +12,29 @@ import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cart, {
-  getTotalCartValue,
-  generateCartItemsFrom,
-  getTotalItems,
-} from "../Cart/Cart";
+import Cart, { getTotalCartValue, getTotalItems } from "../Cart/Cart";
+import { generateCartItemsFrom } from "../Products/Products";
 import "./Checkout.css";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setItems,
+  setSelectedAddress,
+  setNewAddress,
+  resetNewAddress,
+  addressInputOn,
+  getAddress,
+  addNewAddress,
+  deleteAddresses,
+  performFinalCheckout,
+} from "../../redux/addresses/addresses";
 
-
-const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
+export const AddNewAddressView = ({//
+  newAddress,
+  addAddress,
+}) => {
+  const dispatch = useDispatch();
   return (
     <Box display="flex" flexDirection="column">
       <TextField
@@ -31,7 +43,8 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
         minRows={4}
         placeholder="Enter your complete address"
         onChange={(e) => {
-          handleNewAddress({ isAddingNewAddress: true, value: e.target.value });
+          const value = e.target.value;
+          dispatch(setNewAddress(value));//
         }}
       />
       <Stack direction="row" my="1rem">
@@ -45,10 +58,7 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
         <Button
           variant="text"
           onClick={(e) => {
-            handleNewAddress({
-              isAddingNewAddress: false,
-              value: "",
-            });
+            dispatch(resetNewAddress());
           }}
         >
           Cancel
@@ -61,20 +71,18 @@ const AddNewAddressView = ({ newAddress, handleNewAddress, addAddress }) => {
 const Checkout = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [addresses, setAddresses] = useState({ all: [], selected: "" });
-  const [newAddress, setNewAddress] = useState({
-    isAddingNewAddress: false,
-    value: "",
-  });
-  const [getAddress, SetGetAddress] = useState([]);
+  const dispatch = useDispatch();
+  const { newAddress, addresses, products, items } = useSelector((state) => ({
+    newAddress: state.address.newAddress,
+    addresses: state.address.addresses,
+    products: state.products.products,
+    items: state.address.items,
+  }));
 
- 
+
   const getProducts = async () => {
     try {
       const { data } = await axios.get("/api/products");
-      setProducts(data);
       return data.products;
     } catch (e) {
       enqueueSnackbar(
@@ -84,7 +92,6 @@ const Checkout = () => {
     }
   };
 
- 
   const fetchCart = async () => {
     try {
       const { data } = await axios.get("/api/cart");
@@ -104,51 +111,38 @@ const Checkout = () => {
     }
   };
 
-  
-  const getAddresses = async () => {
-    try {
-      const { data } = await axios.get("/api/checkout/addresses");
+  // const getAddresses = async () => {
+  //   try {
+  //     dispatch(getAddress());
+  //   } catch {
+  //     enqueueSnackbar(
+  //       "Could not fetch addresses. Check that the backend is running, reachable and returns valid JSON.",
+  //       {
+  //         variant: "error",
+  //       }
+  //     );
+  //     return null;
+  //   }
+  // };
 
-      setAddresses({ ...addresses, all: data });
-    } catch {
+  const addAddress = async (newAddress) => {
+    try {
+      dispatch(addNewAddress());
+
+    } catch (e) {
       enqueueSnackbar(
-        "Could not fetch addresses. Check that the backend is running, reachable and returns valid JSON.",
+        "Could not add this address. Check that the backend is running, reachable and returns valid JSON.",
         {
           variant: "error",
         }
       );
-      return null;
     }
   };
 
-  
-  const addAddress = async (newAddress) => {
-    try {
-      const { data } = await axios.post("/api/checkout/addresses", {
-        address: newAddress.value,
-      });
-      setAddresses({ ...addresses, all: data });
-      SetGetAddress(data);
-    } catch (e) {
-      if (e.response) {
-        enqueueSnackbar(e.response.data.message, { variant: "error" });
-      } else {
-        enqueueSnackbar(
-          "Could not add this address. Check that the backend is running, reachable and returns valid JSON.",
-          {
-            variant: "error",
-          }
-        );
-      }
-    }
-  };
-  
   const deleteAddress = async (addressId) => {
     try {
-      const url = `/api/checkout/addresses/${addressId}`;
-      const { data } = await axios.delete(url);
-      setAddresses({ ...addresses, all: data });
-      SetGetAddress(data);
+
+      dispatch(deleteAddresses(addressId));
     } catch (e) {
       if (e.response) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -163,7 +157,6 @@ const Checkout = () => {
     }
   };
 
-  
   const validateRequest = (items, addresses) => {
     if (localStorage.getItem("balance") < getTotalCartValue(items)) {
       enqueueSnackbar(
@@ -190,19 +183,10 @@ const Checkout = () => {
     return true;
   };
 
-  
   const performCheckout = async (items, addresses) => {
     if (validateRequest(items, addresses)) {
       try {
-        const { data } = await axios.post(
-          "/api/finalcheckout",
-          { items, addresses },
-          {
-            headers: {
-              "content-type": "application/json",
-            },
-          }
-        );
+        dispatch(performFinalCheckout(items, addresses));
         localStorage.setItem(
           "balance",
           localStorage.getItem("balance") - getTotalCartValue(items)
@@ -224,7 +208,6 @@ const Checkout = () => {
     }
   };
 
-  
   useEffect(() => {
     const onLoadHandler = async () => {
       const productsData = await getProducts();
@@ -232,17 +215,17 @@ const Checkout = () => {
       const cartData = await fetchCart();
 
       if (productsData && cartData) {
-        const cartDetails = await generateCartItemsFrom(cartData, productsData);
+        const cartDetails = generateCartItemsFrom(cartData, productsData);
         setItems(cartDetails);
+        dispatch(setItems(cartDetails));
       }
     };
     onLoadHandler();
   }, []);
 
-  
-  useEffect(() => {
-    getAddresses();
-  }, [getAddress]);
+  // useEffect(() => {
+  //   getAddresses();
+  // }, [loadGetAddress]);
 
   return (
     <>
@@ -270,9 +253,7 @@ const Checkout = () => {
                           ? `selected`
                           : `not-selected`
                       }`}
-                      onClick={(eve) =>
-                        setAddresses({ ...addresses, selected: e.id })
-                      }
+                      onClick={() => dispatch(setSelectedAddress(e.id))}
                       key={e.id}
                     >
                       <Typography>{e.address}</Typography>
@@ -299,10 +280,7 @@ const Checkout = () => {
                 id="add-new-btn"
                 size="large"
                 onClick={() => {
-                  setNewAddress((currNewAddress) => ({
-                    ...currNewAddress,
-                    isAddingNewAddress: true,
-                  }));
+                  dispatch(addressInputOn());
                 }}
               >
                 Add new address
@@ -310,7 +288,6 @@ const Checkout = () => {
             ) : (
               <AddNewAddressView
                 newAddress={newAddress}
-                handleNewAddress={setNewAddress}
                 addAddress={addAddress}
               />
             )}
@@ -333,7 +310,7 @@ const Checkout = () => {
             <Button
               startIcon={<CreditCard />}
               variant="contained"
-              onClick={(e) => performCheckout(items, addresses)}
+              onClick={() => performCheckout(items, addresses)}
               data-cy="place-order"
             >
               PLACE ORDER

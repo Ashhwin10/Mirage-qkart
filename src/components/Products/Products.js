@@ -14,31 +14,54 @@ import Header from "../Header/Header.js";
 import "./Products.css";
 import ProductCard from "../Productcard/ProductCard.js";
 import { Typography } from "@mui/material";
-import Cart, { generateCartItemsFrom } from "../Cart/Cart.js";
+import Cart from "../Cart/Cart.js";
 import "../Cart/Cart.css";
-import { loginSuccess } from "../../redux/login/loginSlice.js";
-import { setProducts } from "../../redux/products/products.js";
+import { setProducts, fetchProducts,performApiCall } from "../../redux/products/products.js";
 import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
-import { setCartProducts } from "../../redux/cart/cart.js";
+import { setCartProducts,fetchCartData } from "../../redux/cart/cart.js";
 import { useDispatch, useSelector } from "react-redux";
 
 
+
+export const generateCartItemsFrom = (cartData, productsData) => {
+  if (!cartData) {
+    return [];
+  }
+
+  const cartItems = [];
+  const cartArray = cartData.cart.items;
+
+  for (let i = 0; i < cartArray.length; i++) {
+    for (let j = 0; j < productsData.length; j++) {
+      const cartProduct = cartArray[i];
+      const product = productsData[j];
+
+      if (cartProduct.qty > 0 && cartProduct.productId === product.id) {
+        const cartItem = { ...product, qty: cartProduct.qty };
+        cartItems.push(cartItem);
+      }
+    }
+  }
+
+  return cartItems;
+};
 const Products = () => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const [searching, setsearching] = useState(false);
-  const isLoading = useSelector((state) => state.isLoading.isLoading);
-  const products = useSelector((state) => state.products.products);
-  const cartItemList = useSelector((state) => state.cartProducts.cartItemList);
-  const loginStatus = useSelector((state) => state.loginStatus.isLoggedIn);
+  const { isLoading, products, cartItemList, isLoggedIn } = useSelector((state) => ({
+    isLoading: state.isLoading.isLoading,
+    products: state.products.products,
+    cartItemList: state.cartItemList.cartItemList,
+    isLoggedIn: state.isLoggedIn.isLoggedIn,
+  }));
 
   const performAPICall = async () => {
-    dispatch(isLoadingTrue());
     try {
-      const { data } = await axios.get("/api/products");
-      dispatch(setProducts(data.products));
-      dispatch(isLoadingFalse());
+
+      dispatch(performApiCall())
     } catch (e) {
+      
       enqueueSnackbar(
         "Something went wrong in fetching of products Check that the backend is running, reachable and returns valid JSON.",
         { variant: "error" }
@@ -68,14 +91,11 @@ const Products = () => {
     }, debounceTimeout);
   };
 
- 
-
- 
   const fetchCart = async () => {
-    if (loginStatus !== true) return;
+    if (isLoggedIn !== true) return;
     try {
-      const { data } = await axios.get("/api/cart");
-      return data;
+      dispatch(fetchCartData());
+
     } catch (e) {
       if (e.response && e.response.status === 400) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -90,8 +110,6 @@ const Products = () => {
       return null;
     }
   };
-
-
 
   const isItemInCart = (items, productId) => {
     if (!items) return;
@@ -114,7 +132,7 @@ const Products = () => {
     name,
     options = { preventDuplicate: false }
   ) => {
-    if (loginStatus !== true) {
+    if (isLoggedIn !== true) {
       enqueueSnackbar("Login to add item to the Cart", { variant: "Warning" });
       return;
     }
@@ -132,8 +150,6 @@ const Products = () => {
         id,
         name,
       });
-      // const data = response.data;
-
       const nCartItemList = generateCartItemsFrom(data, products);
       // setCartItemList(nCartItemList);
       dispatch(setCartProducts(nCartItemList));
@@ -141,20 +157,18 @@ const Products = () => {
       console.log(e);
     }
   };
-  
 
   useEffect(() => {
     performAPICall();
   }, []);
 
-  
   useEffect(() => {
     fetchCart()
       .then((result) => {
         return generateCartItemsFrom(result, products);
       })
       .then((cartItems) => {
-       dispatch(setCartProducts(cartItems));
+        dispatch(setCartProducts(cartItems));
       });
   }, [products]);
 
@@ -263,7 +277,7 @@ const Products = () => {
             )}
           </Grid>
         </Grid>
-        {loginStatus === true && (
+        {isLoggedIn === true && (
           <Grid
             container
             item

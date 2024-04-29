@@ -2,7 +2,6 @@ import { Box } from "@mui/system";
 import React from "react";
 import "./Footer.css";
 
-// Footer of the page
 
 const Footer = () => {
   return (
