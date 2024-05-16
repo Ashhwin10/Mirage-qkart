@@ -20,7 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -39,7 +39,13 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-react": "^7.24.1",
+    "@testing-library/react": "^15.0.7",
+    "babel-jest": "^29.7.0",
     "cypress": "^13.7.2",
-    "miragejs": "^0.1.48"
+    "jest": "^27.5.1",
+    "miragejs": "^0.1.48",
+    "react-test-renderer": "^18.3.1"
   }
 }

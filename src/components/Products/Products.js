@@ -16,12 +16,9 @@ import ProductCard from "../Productcard/ProductCard.js";
 import { Typography } from "@mui/material";
 import Cart from "../Cart/Cart.js";
 import "../Cart/Cart.css";
-import { setProducts, fetchProducts,performApiCall } from "../../redux/products/products.js";
-import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
-import { setCartProducts,fetchCartData } from "../../redux/cart/cart.js";
+import { setProducts, performApiCall } from "../../redux/products/products.js";
+import { setCartProducts, fetchCartData } from "../../redux/cart/cart.js";
 import { useDispatch, useSelector } from "react-redux";
-
-
 
 export const generateCartItemsFrom = (cartData, productsData) => {
   if (!cartData) {
@@ -45,23 +42,25 @@ export const generateCartItemsFrom = (cartData, productsData) => {
 
   return cartItems;
 };
+
+
 const Products = () => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const [searching, setsearching] = useState(false);
-  const { isLoading, products, cartItemList, isLoggedIn } = useSelector((state) => ({
-    isLoading: state.isLoading.isLoading,
-    products: state.products.products,
-    cartItemList: state.cartItemList.cartItemList,
-    isLoggedIn: state.isLoggedIn.isLoggedIn,
-  }));
+  const { isLoading, products, cartItemList, isLoggedIn } = useSelector(
+    (state) => ({
+      isLoading: state.isLoading.isLoading,
+      products: state.products.products,
+      cartItemList: state.cartItemList.cartItemList,
+      isLoggedIn: state.isLoggedIn.isLoggedIn,
+    })
+  );
 
   const performAPICall = async () => {
     try {
-
-      dispatch(performApiCall())
+      dispatch(performApiCall());
     } catch (e) {
-      
       enqueueSnackbar(
         "Something went wrong in fetching of products Check that the backend is running, reachable and returns valid JSON.",
         { variant: "error" }
@@ -95,7 +94,6 @@ const Products = () => {
     if (isLoggedIn !== true) return;
     try {
       dispatch(fetchCartData());
-
     } catch (e) {
       if (e.response && e.response.status === 400) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
@@ -121,7 +119,6 @@ const Products = () => {
     return false;
   };
 
-  //  Perform the API call to add or update items in the user's cart and update local cart data to display the latest cart
 
   const addToCart = async (
     items,
@@ -151,7 +148,6 @@ const Products = () => {
         name,
       });
       const nCartItemList = generateCartItemsFrom(data, products);
-      // setCartItemList(nCartItemList);
       dispatch(setCartProducts(nCartItemList));
     } catch (e) {
       console.log(e);

@@ -7,73 +7,37 @@ import Header from "../Header/Header";
 import "./Register.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { isLoadingFalse, isLoadingTrue } from "../../redux/loading/loading";
+import { setLoading } from "../../redux/loading/loading";
 import { useSelector, useDispatch } from "react-redux";
-
-const ACTIONS = {
-  SET_DATA: "set-data",
-  CLEAR_DATA: "clear-data",
-};
-
-
-function reducer(state, action) {
-  switch (action.type) {
-    case ACTIONS.SET_DATA:
-      return { ...state, ...action.payload };
-    case ACTIONS.CLEAR_DATA:
-      return { username: "", password: "", confirmPassword: "" };
-    default:
-      return state;
-  }
-}
+import { setData, registerUser } from "../../redux/register/register";
 
 const Register = () => {
-  const dispatchh = useDispatch();
-  const loading = useSelector((state)=> state.isLoading.isLoading)
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.isLoading);
+  const data = useSelector((state) => state.register);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const [state, dispatch] = useReducer(reducer, {
-    username: "",
-    password: "",
-    confirmPassword: "",
-  }); 
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    dispatch({ type: ACTIONS.SET_DATA, payload: { [name]: value } });
+    dispatch(setData({ [name]: value }));
   };
-  
+
   const register = async () => {
-    const { username, password, confirmPassword } = state;
-    if (!validateInput(state)) {
+    const { username, password } = data;
+    if (!validateInput(data)) {
       return;
     }
     try {
-      dispatchh(isLoadingTrue())
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      dispatchh(isLoadingFalse())
-
-      dispatch({
-        type: ACTIONS.CLEAR_DATA
-      });
-
-      if (response.ok) {
-        const resJson = await response.json();
-        if (resJson.success) {
-          enqueueSnackbar("Registered Successfully", { variant: "success" });
-          navigate("/login");
-        } else {
-          enqueueSnackbar("Username not available", { variant: "error" });
-        }
+      const response = await dispatch(registerUser(username, password));
+      if (response.success) {
+        enqueueSnackbar("Registered Successfully", { variant: "success" });
+        navigate("/login");
+      } else {
+        enqueueSnackbar("Username not available", { variant: "error" });
       }
     } catch (e) {
-      dispatchh(isLoadingFalse())
+      dispatch(setLoading(false));
       enqueueSnackbar(
         "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
         { variant: "error" }
@@ -82,6 +46,7 @@ const Register = () => {
   };
 
   const validateInput = (data) => {
+    console.log(data)
     if (!data.username) {
       enqueueSnackbar("Username is a required field", { variant: "warning" });
       return false;
@@ -128,6 +93,7 @@ const Register = () => {
           <Stack spacing={2}>
             <h2 className="title">Register</h2>
             <TextField
+            data-testid = "usernameTextBox"
               id="username"
               label="Username"
               variant="outlined"
@@ -136,7 +102,7 @@ const Register = () => {
               placeholder="Enter Username"
               fullWidth
               onChange={handleChange}
-              value={state.username}
+              // value={data.username}
             />
             <TextField
               id="password"
@@ -148,7 +114,7 @@ const Register = () => {
               fullWidth
               placeholder="Enter a password with minimum 6 characters"
               onChange={handleChange}
-              value={state.password}
+              // value={data.password}
             />
             <TextField
               id="confirmPassword"
@@ -158,9 +124,9 @@ const Register = () => {
               type="password"
               fullWidth
               onChange={handleChange}
-              value={state.confirmPassword}
+              // value={data.confirmPassword}
             />
-            {loading ? (
+            {isLoading ? (
               <CircularProgress
                 size={25}
                 style={{ margin: "16px auto 0", marginTop: "20px" }}

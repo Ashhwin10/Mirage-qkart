@@ -15,7 +15,7 @@ export const cartSlice = createSlice({
   },
 });
 
-export const fetchCartData = () => async (dispatch) => {
+export const fetchCartData = () => async () => {
   try {
     const { data } = await axios.get("/api/cart");
     return data;

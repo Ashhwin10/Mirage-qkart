@@ -1,76 +1,56 @@
 import { Button,Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useSnackbar } from "notistack";
-import React, {  useReducer } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Footer from "../Footer/Footer.js";
 import Header from "../Header/Header.js";
 import "./Login.css";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSuccess } from "../../redux/login/loginSlice.js";
-import { isLoadingTrue, isLoadingFalse } from "../../redux/loading/loading.js";
+import { loginSuccess,setFormData,fetchLoginData } from "../../redux/login/loginSlice.js";
+import { setLoading } from "../../redux/loading/loading.js";
 
 
 
-const ACTIONS = {
-  SET_FORMDATA: "set-formdata",
-};
-
-
-function reducer(state, action) {
-  switch (action.type) {
-    case ACTIONS.SET_FORMDATA:
-      return { ...state, ...action.payload };
-    default:
-      return state;
-  }
-}
 const Login = () => {
   const dispatchh = useDispatch();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [state, dispatch] = useReducer(reducer, { username: "", password: "" }); // State for the login user input
+
+  const readData = useSelector((state) => state.isLoggedIn.userData)
+  console.log(readData)
   const handleChange = (event) => {
     const { name, value } = event.target;
-    dispatch({ type: ACTIONS.SET_FORMDATA, payload: { [name]: value } });
-  };
+    dispatchh(setFormData({ ...readData, [name]: value }));
+};
 
-  
+
   const login = async (formData) => {
+    console.log("formdata", formData)
     if (!validateInput(formData)) return;
     try {
-      dispatchh(isLoadingTrue());
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      let data = await response.json();
+      
 
+      const data = await dispatchh (fetchLoginData(formData));
       let { username, balance } = data.data;
-
-      dispatch({ type: ACTIONS.SET_FORMDATA });
-      dispatchh(isLoadingFalse());
-
       if (data.success) {
         enqueueSnackbar("logged in successfully", { variant: "success" });
-        persistLogin(data.data.username, data.data.balance);
+        persistLogin(username, balance);
         dispatchh(loginSuccess());
         navigate("/");
       } else {
         enqueueSnackbar("User not registered", { variant: "error" });
       }
     } catch (e) {
-      dispatchh(isLoadingFalse());
+      dispatchh(setLoading(false));
       enqueueSnackbar("Invalid username or password", { variant: "error" });
     }
   };
 
   
   const validateInput = (data) => {
+    console.log("data",data)
     if (data.username === "") {
       enqueueSnackbar("username is a required field", { variant: "warning" });
       return false;
@@ -115,7 +95,7 @@ const Login = () => {
               placeholder="Enter Username"
               fullWidth
               onChange={handleChange}
-              value={state.username}
+              // value={state.username}
             />
             <TextField
               id="password"
@@ -127,12 +107,12 @@ const Login = () => {
               fullWidth
               placeholder="Enter a password with minimum 6 characters"
               onChange={handleChange}
-              value={state.password}
+              // value={state.password}
             />
             <Button
               className="button"
               variant="contained"
-              onClick={() => login(state)}
+              onClick={() => login(readData)} 
               data-cy="Login"
             >
               LOGIN TO QKART

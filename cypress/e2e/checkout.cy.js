@@ -19,7 +19,7 @@ it('Add new address',()=>{
     cy.get('[data-cy="add-new-btn"]').click()
     cy.get('.address-item').its('length').should('be.gt',0)
 })
-
+  
 
 it('Delete address',()=>{
     cy.get('#add-new-btn').click()

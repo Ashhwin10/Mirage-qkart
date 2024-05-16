@@ -43,8 +43,7 @@ const addressSlice = createSlice({
 });
 
 export const getAddress = () => async (dispatch) => {
-  //
-  try {
+    try {
     const { data } = await axios.get("/api/checkout/addresses");
     dispatch(setAddresses(data));
   } catch (e) {

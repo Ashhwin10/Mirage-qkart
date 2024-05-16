@@ -10,7 +10,7 @@ import {
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cart, { getTotalCartValue, getTotalItems } from "../Cart/Cart";
 import { generateCartItemsFrom } from "../Products/Products";
@@ -18,55 +18,15 @@ import "./Checkout.css";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import { useDispatch, useSelector } from "react-redux";
+import { AddNewAddressView } from "../Address/Address";
 import {
   setItems,
   setSelectedAddress,
-  setNewAddress,
-  resetNewAddress,
   addressInputOn,
-  getAddress,
   addNewAddress,
   deleteAddresses,
   performFinalCheckout,
 } from "../../redux/addresses/addresses";
-
-export const AddNewAddressView = ({//
-  newAddress,
-  addAddress,
-}) => {
-  const dispatch = useDispatch();
-  return (
-    <Box display="flex" flexDirection="column">
-      <TextField
-        data-cy="address-textbox"
-        multiline
-        minRows={4}
-        placeholder="Enter your complete address"
-        onChange={(e) => {
-          const value = e.target.value;
-          dispatch(setNewAddress(value));//
-        }}
-      />
-      <Stack direction="row" my="1rem">
-        <Button
-          data-cy="add-new-btn"
-          variant="contained"
-          onClick={() => addAddress(newAddress)}
-        >
-          Add
-        </Button>
-        <Button
-          variant="text"
-          onClick={(e) => {
-            dispatch(resetNewAddress());
-          }}
-        >
-          Cancel
-        </Button>
-      </Stack>
-    </Box>
-  );
-};
 
 const Checkout = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -110,20 +70,6 @@ const Checkout = () => {
       return null;
     }
   };
-
-  // const getAddresses = async () => {
-  //   try {
-  //     dispatch(getAddress());
-  //   } catch {
-  //     enqueueSnackbar(
-  //       "Could not fetch addresses. Check that the backend is running, reachable and returns valid JSON.",
-  //       {
-  //         variant: "error",
-  //       }
-  //     );
-  //     return null;
-  //   }
-  // };
 
   const addAddress = async (newAddress) => {
     try {
@@ -223,9 +169,6 @@ const Checkout = () => {
     onLoadHandler();
   }, []);
 
-  // useEffect(() => {
-  //   getAddresses();
-  // }, [loadGetAddress]);
 
   return (
     <>

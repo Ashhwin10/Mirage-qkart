@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
-import { isLoadingTrue,isLoadingFalse } from "../loading/loading";
+import { setLoading} from "../loading/loading";
 
 export const productsSlice = createSlice({
   name: "products",
@@ -9,16 +9,14 @@ export const productsSlice = createSlice({
     setProducts: (state, action) => {
       state.products=action.payload;
     },
-
   },
-  
 });
 
 export const performApiCall = () => async (dispatch) => {
-  dispatch(isLoadingTrue()) 
+  dispatch(setLoading(true)) 
   try {
     dispatch(fetchProducts());
-    dispatch(isLoadingFalse());
+    dispatch(setLoading(false));
   } catch (e) {
   console.log(e)
   }

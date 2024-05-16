@@ -4,6 +4,7 @@ import productsReducer from "./products/products.js"
 import loadingReducer from "./loading/loading.js"
 import cartReducer from "./cart/cart.js"
 import addressReducer from "./addresses/addresses.js"
+import registerReducer from "./register/register.js"
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     products:productsReducer,
     isLoading:loadingReducer,
     cartItemList:cartReducer,
-    address:addressReducer
+    address:addressReducer,
+    register:registerReducer
   },
 });
