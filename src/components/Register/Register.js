@@ -105,6 +105,7 @@ const Register = () => {
               // value={data.username}
             />
             <TextField
+            data-testid = "passwordTextBox"
               id="password"
               variant="outlined"
               label="Password"
@@ -117,6 +118,7 @@ const Register = () => {
               // value={data.password}
             />
             <TextField
+            data-testid = "confirmPasswordTextBox"
               id="confirmPassword"
               variant="outlined"
               label="Confirm Password"
@@ -132,7 +134,7 @@ const Register = () => {
                 style={{ margin: "16px auto 0", marginTop: "20px" }}
               />
             ) : (
-              <Button className="button" variant="contained" type="submit">
+              <Button className="button" variant="contained" type="submit"  data-testid = "registerNowButton">
                 Register Now
               </Button>
             )}

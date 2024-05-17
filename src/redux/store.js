@@ -6,7 +6,7 @@ import cartReducer from "./cart/cart.js"
 import addressReducer from "./addresses/addresses.js"
 import registerReducer from "./register/register.js"
 
-export const store = configureStore({
+ const store = configureStore({
   reducer: {
     isLoggedIn: loginStatusReducer,
     products:productsReducer,
@@ -16,3 +16,4 @@ export const store = configureStore({
     register:registerReducer
   },
 });
+export default store;
