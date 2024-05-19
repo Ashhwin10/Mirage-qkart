@@ -19,7 +19,6 @@ const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const readData = useSelector((state) => state.isLoggedIn.userData)
-  console.log(readData)
   const handleChange = (event) => {
     const { name, value } = event.target;
     dispatchh(setFormData({ ...readData, [name]: value }));
@@ -27,7 +26,6 @@ const Login = () => {
 
 
   const login = async (formData) => {
-    console.log("formdata", formData)
     if (!validateInput(formData)) return;
     try {
       
@@ -87,6 +85,7 @@ const Login = () => {
           <Stack spacing={2} className="form">
             <h2 className="title">Login</h2>
             <TextField
+             data-testid = "usernameTextBox"
               id="username"
               label="Username"
               variant="outlined"
@@ -98,6 +97,7 @@ const Login = () => {
               // value={state.username}
             />
             <TextField
+             data-testid = "passwordTextBox"
               id="password"
               variant="outlined"
               label="Password"
@@ -110,6 +110,7 @@ const Login = () => {
               // value={state.password}
             />
             <Button
+             data-testid = "loginButton"
               className="button"
               variant="contained"
               onClick={() => login(readData)} 

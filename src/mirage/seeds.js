@@ -12,6 +12,7 @@ export const models = {
 export function seeds(server) {
   // Test user login details
   server.create("user", { username: "testuser", password: "11111111" });
+  server.create("user", { username: "Ashwin", password: "11111111" });
   const productData = [ 
     {
       id: 1,
