@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { useSnackbar } from "notistack";
-import React, { useReducer } from "react";
+import React from "react";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import "./Register.css";
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { setLoading } from "../../redux/loading/loading";
 import { useSelector, useDispatch } from "react-redux";
 import { setData, registerUser } from "../../redux/register/register";
+import { validateInput } from "./RegisterValidation";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const Register = () => {
 
   const register = async () => {
     const { username, password } = data;
-    if (!validateInput(data)) {
+    if (!validateInput(data, enqueueSnackbar)) {
       return;
     }
     try {
@@ -43,35 +44,6 @@ const Register = () => {
         { variant: "error" }
       );
     }
-  };
-
-  const validateInput = (data) => {
-    console.log(data)
-    if (!data.username) {
-      enqueueSnackbar("Username is a required field", { variant: "warning" });
-      return false;
-    }
-    if (data.username.length < 6) {
-      enqueueSnackbar("Username must be more than 6 characters", {
-        variant: "warning",
-      });
-      return false;
-    }
-    if (!data.password) {
-      enqueueSnackbar("Password is a required field", { variant: "warning" });
-      return false;
-    }
-    if (data.password.length < 6) {
-      enqueueSnackbar("Password must be more than 6 characters", {
-        variant: "warning",
-      });
-      return false;
-    }
-    if (data.password !== data.confirmPassword) {
-      enqueueSnackbar("Passwords do not match", { variant: "warning" });
-      return false;
-    }
-    return true;
   };
 
   return (
@@ -93,7 +65,6 @@ const Register = () => {
           <Stack spacing={2}>
             <h2 className="title">Register</h2>
             <TextField
-            data-testid = "usernameTextBox"
               id="username"
               label="Username"
               variant="outlined"
@@ -105,7 +76,6 @@ const Register = () => {
               // value={data.username}
             />
             <TextField
-            data-testid = "passwordTextBox"
               id="password"
               variant="outlined"
               label="Password"
@@ -113,16 +83,16 @@ const Register = () => {
               type="password"
               helperText="Password must be at least 6 characters long"
               fullWidth
-              placeholder="Enter a password with minimum 6 characters"
+              placeholder="Enter password"
               onChange={handleChange}
               // value={data.password}
             />
             <TextField
-            data-testid = "confirmPasswordTextBox"
               id="confirmPassword"
               variant="outlined"
               label="Confirm Password"
               name="confirmPassword"
+              placeholder="Enter confirm password"
               type="password"
               fullWidth
               onChange={handleChange}
@@ -134,7 +104,12 @@ const Register = () => {
                 style={{ margin: "16px auto 0", marginTop: "20px" }}
               />
             ) : (
-              <Button className="button" variant="contained" type="submit"  data-testid = "registerNowButton">
+              <Button
+                className="button"
+                variant="contained"
+                type="submit"
+                title="registerNowButton"
+              >
                 Register Now
               </Button>
             )}

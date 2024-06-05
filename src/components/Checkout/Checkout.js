@@ -1,20 +1,11 @@
 import { CreditCard } from "@mui/icons-material";
-import {
-  Button,
-  Divider,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { Box } from "@mui/system";
+import { Button, Divider, Grid, Box, Typography } from "@mui/material";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cart, { getTotalCartValue, getTotalItems } from "../Cart/Cart";
 import { generateCartItemsFrom } from "../Products/Products";
-import "./Checkout.css";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +18,39 @@ import {
   deleteAddresses,
   performFinalCheckout,
 } from "../../redux/addresses/addresses";
+import "./Checkout.css";
+import { validateRequest } from "./CheckoutValidation";
+
+export const performCheckout = async (
+  items,
+  addresses,
+  dispatch,
+  navigate,
+  enqueueSnackbar
+) => {
+  if (validateRequest(items, addresses, enqueueSnackbar)) {
+    try {
+      dispatch(performFinalCheckout(items, addresses));
+      localStorage.setItem(
+        "balance",
+        localStorage.getItem("balance") - getTotalCartValue(items)
+      );
+      enqueueSnackbar("Order placed successfully", { variant: "success" });
+      navigate("/thanks");
+    } catch (e) {
+      if (e.response) {
+        enqueueSnackbar(e.response.data.message, { variant: "error" });
+      } else {
+        enqueueSnackbar(
+          "Check that the backend is running, reachable and returns valid JSON.",
+          {
+            variant: "error",
+          }
+        );
+      }
+    }
+  }
+};
 
 const Checkout = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -38,15 +62,14 @@ const Checkout = () => {
     products: state.products.products,
     items: state.address.items,
   }));
-
-
+  console.log(items);
   const getProducts = async () => {
     try {
       const { data } = await axios.get("/api/products");
       return data.products;
     } catch (e) {
       enqueueSnackbar(
-        "Something went wrong in fetching of products in checkout page. Check that the backend is running, reachable and returns valid JSON.",
+        "Something went wrong in fetching products in checkout page. Check that the backend is running, reachable, and returns valid JSON.",
         { variant: "error" }
       );
     }
@@ -61,95 +84,36 @@ const Checkout = () => {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
       } else {
         enqueueSnackbar(
-          "Could not fetch cart details in checkout page . Check that the backend is running, reachable and returns valid JSON.",
-          {
-            variant: "error",
-          }
+          "Could not fetch cart details in checkout page. Check that the backend is running, reachable, and returns valid JSON.",
+          { variant: "error" }
         );
       }
       return null;
     }
   };
 
-  const addAddress = async (newAddress) => {
+  const addAddress = async () => {
     try {
       dispatch(addNewAddress());
-
     } catch (e) {
       enqueueSnackbar(
-        "Could not add this address. Check that the backend is running, reachable and returns valid JSON.",
-        {
-          variant: "error",
-        }
+        "Could not add this address. Check that the backend is running, reachable, and returns valid JSON.",
+        { variant: "error" }
       );
     }
   };
 
   const deleteAddress = async (addressId) => {
     try {
-
       dispatch(deleteAddresses(addressId));
     } catch (e) {
       if (e.response) {
         enqueueSnackbar(e.response.data.message, { variant: "error" });
       } else {
         enqueueSnackbar(
-          "Could not delete this address. Check that the backend is running, reachable and returns valid JSON.",
-          {
-            variant: "error",
-          }
+          "Could not delete this address. Check that the backend is running, reachable, and returns valid JSON.",
+          { variant: "error" }
         );
-      }
-    }
-  };
-
-  const validateRequest = (items, addresses) => {
-    if (localStorage.getItem("balance") < getTotalCartValue(items)) {
-      enqueueSnackbar(
-        "You do not have enough balance in your wallet for this purchase",
-        { variant: "warning" }
-      );
-      return false;
-    }
-
-    if (!addresses.all.length) {
-      enqueueSnackbar("Please add a new address before proceeding.", {
-        variant: "warning",
-      });
-      return false;
-    }
-
-    if (!addresses.selected.length) {
-      enqueueSnackbar("Please select one shipping address to proceed.", {
-        variant: "warning",
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  const performCheckout = async (items, addresses) => {
-    if (validateRequest(items, addresses)) {
-      try {
-        dispatch(performFinalCheckout(items, addresses));
-        localStorage.setItem(
-          "balance",
-          localStorage.getItem("balance") - getTotalCartValue(items)
-        );
-        enqueueSnackbar("Order placed successfully", { variant: "success" });
-        navigate("/thanks");
-      } catch (e) {
-        if (e.response) {
-          enqueueSnackbar(e.response.data.message, { variant: "error" });
-        } else {
-          enqueueSnackbar(
-            "Check that the backend is running, reachable and returns valid JSON.",
-            {
-              variant: "error",
-            }
-          );
-        }
       }
     }
   };
@@ -157,18 +121,15 @@ const Checkout = () => {
   useEffect(() => {
     const onLoadHandler = async () => {
       const productsData = await getProducts();
-
       const cartData = await fetchCart();
 
       if (productsData && cartData) {
         const cartDetails = generateCartItemsFrom(cartData, productsData);
-        setItems(cartDetails);
         dispatch(setItems(cartDetails));
       }
     };
     onLoadHandler();
-  }, []);
-
+  }, [dispatch]);
 
   return (
     <>
@@ -187,35 +148,31 @@ const Checkout = () => {
             <Divider />
             <Box>
               {addresses.all.length > 0 ? (
-                addresses.all.map((e) => {
-                  return (
-                    <Box
-                      data-cy="select-address"
-                      className={`address-item ${
-                        addresses.selected === e.id
-                          ? `selected`
-                          : `not-selected`
-                      }`}
-                      onClick={() => dispatch(setSelectedAddress(e.id))}
-                      key={e.id}
+                addresses.all.map((e) => (
+                  <Box
+                    data-cy="select-address"
+                    className={`address-item ${
+                      addresses.selected === e.id ? `selected` : `not-selected`
+                    }`}
+                    onClick={() => dispatch(setSelectedAddress(e.id))}
+                    key={e.id}
+                  >
+                    <Typography data-testid="addresses">{e.address}</Typography>
+                    <Button
+                      data-cy="delete-address"
+                      onClick={() => deleteAddress(e.id)}
                     >
-                      <Typography>{e.address}</Typography>
-                      <Button
-                        data-cy="delete-address"
-                        onClick={() => deleteAddress(e.id)}
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  );
-                })
+                      Delete
+                    </Button>
+                  </Box>
+                ))
               ) : (
                 <Typography my="1rem">
-                  No addresses found for this account. Please add one to proceed
+                  No addresses found for this account. Please add one to
+                  proceed.
                 </Typography>
               )}
             </Box>
-
             {newAddress.isAddingNewAddress !== true ? (
               <Button
                 color="primary"
@@ -234,7 +191,6 @@ const Checkout = () => {
                 addAddress={addAddress}
               />
             )}
-
             <Typography color="#3C3C3C" variant="h4" my="1rem">
               Payment
             </Typography>
@@ -249,11 +205,18 @@ const Checkout = () => {
                 {localStorage.getItem("balance")}
               </Typography>
             </Box>
-
             <Button
               startIcon={<CreditCard />}
               variant="contained"
-              onClick={() => performCheckout(items, addresses)}
+              onClick={() =>
+                performCheckout(
+                  items,
+                  addresses,
+                  dispatch,
+                  navigate,
+                  enqueueSnackbar
+                )
+              }
               data-cy="place-order"
             >
               PLACE ORDER

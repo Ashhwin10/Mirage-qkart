@@ -6,7 +6,7 @@ import { MirageSetup } from "./mirage/mirage.js";
 import Products from "./components/Products/Products.js";
 import Checkout from "./components/Checkout/Checkout.js";
 import Thanks from "./components/Thanks/Thanks.js";
-
+import Favorites from "./components/Favorites/Favorites.js";
 
 MirageSetup();
 
@@ -19,8 +19,9 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Products />} />
-            <Route path="/checkout" element={<Checkout/>} />
-            <Route path="/thanks" element={<Thanks/>}/>
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/thanks" element={<Thanks />} />
           </Routes>
         </div>
       </BrowserRouter>

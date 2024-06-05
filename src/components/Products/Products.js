@@ -43,7 +43,6 @@ export const generateCartItemsFrom = (cartData, productsData) => {
   return cartItems;
 };
 
-
 const Products = () => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
@@ -119,7 +118,6 @@ const Products = () => {
     return false;
   };
 
-
   const addToCart = async (
     items,
     products,
@@ -191,7 +189,7 @@ const Products = () => {
               </InputAdornment>
             ),
           }}
-          placeholder="Search for items/categories"
+          placeholder="Search for items/categoies"
           name="search"
           onChange={(event) => debounceSearch(event, 500)}
         />
@@ -210,7 +208,7 @@ const Products = () => {
             </InputAdornment>
           ),
         }}
-        placeholder="Search for items/categories"
+        placeholder="Search for items"
         name="search"
         onChange={(event) => debounceSearch(event, 500)}
       />
@@ -249,7 +247,13 @@ const Products = () => {
               >
                 {products !== "empty" ? (
                   products.map((item) => (
-                    <Grid item key={item.id} xs={6} md={3}>
+                    <Grid
+                      item
+                      key={item.id}
+                      xs={6}
+                      md={3}
+                      data-testid="products"
+                    >
                       <ProductCard
                         product={item}
                         handleAddToCart={async () => {

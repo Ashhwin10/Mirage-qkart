@@ -43,7 +43,7 @@ const addressSlice = createSlice({
 });
 
 export const getAddress = () => async (dispatch) => {
-    try {
+  try {
     const { data } = await axios.get("/api/checkout/addresses");
     dispatch(setAddresses(data));
   } catch (e) {
@@ -59,7 +59,7 @@ export const addNewAddress = () => async (dispatch, getState) => {
       address: addressValue,
     });
     dispatch(setAddresses(data));
-    dispatch(getAddress())
+    dispatch(getAddress());
   } catch (e) {
     console.log(e);
   }
@@ -67,10 +67,10 @@ export const addNewAddress = () => async (dispatch, getState) => {
 
 export const deleteAddresses = (addressId) => async (dispatch) => {
   try {
-    const url = `/api/checkout/addresses/${addressId}`
+    const url = `/api/checkout/addresses/${addressId}`;
     const { data } = await axios.delete(url);
     dispatch(setAddresses(data));
-    dispatch(getAddress())
+    dispatch(getAddress());
   } catch (error) {
     console.error("Error deleting address:", error);
   }
@@ -78,7 +78,7 @@ export const deleteAddresses = (addressId) => async (dispatch) => {
 
 export const performFinalCheckout = (items, addresses) => () => {
   try {
-      axios.post(
+    axios.post(
       "/api/finalcheckout",
       { items, addresses },
       {
@@ -99,6 +99,6 @@ export const {
   setAddressesData,
   setSelectedAddress,
   addressInputOn,
-} = addressSlice.actions; 
+} = addressSlice.actions;
 
-export default addressSlice.reducer; 
+export default addressSlice.reducer;

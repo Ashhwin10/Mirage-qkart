@@ -33,8 +33,6 @@ export const fetchLoginData = (formData) => async (dispatch) => {
       body: JSON.stringify(formData),
     });
     let data = await response.json();
-    
-console.log("data in loginAlice",data)
     let { username, balance } = data.data;
     dispatch(setFormData(username));
     dispatch(setLoading(false));

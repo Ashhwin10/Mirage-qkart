@@ -16,7 +16,6 @@ describe("Products page", () => {
       cy.get('[data-cy="Cart-details"]').its('length').should('be.gt',0)
       
   })
-  // cy.get('.css-zgtx0t').its('length').should('be.gt',0)
 
   it('increase and decrease qty of product in cart',() => {
       cy.get(':nth-child(2) > .MuiPaper-root > .MuiCardActions-root > .MuiButtonBase-root').click()

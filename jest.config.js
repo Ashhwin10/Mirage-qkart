@@ -1,7 +1,11 @@
-const config = {
-  transform: {
-    "^.+\\.(js|jsx)$": "babel-jest"
-  }
-};
 
-module.exports = config;
+module.exports = {
+  transform: {
+    "^.+\\.jsx?$": "babel-jest"
+  },
+  transformIgnorePatterns: [
+    "node_modules/(?!@toolz/allow-react/)"
+  ],
+  testEnvironment: "jest-environment-jsdom",
+  moduleFileExtensions: ["js", "jsx"]
+};

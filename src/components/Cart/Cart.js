@@ -9,9 +9,7 @@ import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.js";
-import { setProducts } from "../../redux/products/products.js";
 import { useSelector } from "react-redux";
-
 
 export const getTotalCartValue = (items = []) => {
   let total = 0;
@@ -24,33 +22,45 @@ export const getTotalCartValue = (items = []) => {
   return total;
 };
 
-
 export const getTotalItems = (items = []) => {
   return items.length;
 };
 
-
 const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
   return (
     <Stack direction="row" alignItems="center">
-      <IconButton size="small" color="primary" onClick={handleDelete}  data-cy="remove">
+      <IconButton
+        size="small"
+        color="primary"
+        onClick={handleDelete}
+        data-cy="remove"
+        data-testid="removeqty"
+      >
         <RemoveOutlined />
       </IconButton>
-      <Box padding="0.5rem" data-testid="item-qty" className="cart-item"  data-cy="qty-value">
+      <Box
+        padding="0.5rem"
+        data-testid="item-qty"
+        className="cart-item"
+        data-cy="qty-value"
+      >
         {value}
       </Box>
-      <IconButton size="small" color="primary" onClick={handleAdd}  data-cy="add">
+      <IconButton
+        size="small"
+        color="primary"
+        onClick={handleAdd}
+        data-cy="add"
+        data-testid="addqty"
+      >
         <AddOutlined />
       </IconButton>
     </Stack>
   );
 };
 
-
 const Cart = ({ items = [], handleQuantity, isReadOnly }) => {
-
-  const {products} = useSelector((state) => state.products)
-  
+  const { products } = useSelector((state) => state.products);
   const navigate = useNavigate();
   if (items.length === 0) {
     return (
@@ -72,6 +82,7 @@ const Cart = ({ items = [], handleQuantity, isReadOnly }) => {
                 key={key}
                 alignItems="flex-start"
                 padding="1rem"
+                data-testid="Cart-details"
               >
                 <Box className="image-container">
                   <img src={e.image} alt={e.name} width="100%" height="100%" />

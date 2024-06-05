@@ -1,6 +1,5 @@
 import { Model } from "miragejs";
 
-// Define your models
 export const models = {
   user: Model,
   product: Model,
@@ -8,12 +7,11 @@ export const models = {
   addresses: Model,
 };
 
-// Define your seeds
 export function seeds(server) {
-  // Test user login details
   server.create("user", { username: "testuser", password: "11111111" });
   server.create("user", { username: "Ashwin", password: "11111111" });
-  const productData = [ 
+
+  const productData = [
     {
       id: 1,
       name: "iPhone 9",
@@ -82,26 +80,23 @@ export function seeds(server) {
       name: "HP Pavilion 15-DK1056WM",
       price: 1099,
       rating: 4.43,
-      image:
-        "https://cdn.dummyjson.com/product-images/10/thumbnail.jpeg",
+      image: "https://cdn.dummyjson.com/product-images/10/thumbnail.jpeg",
     },
     {
       id: 11,
       name: "perfume Oil",
       price: 13,
       rating: 4.26,
-      image:
-        "https://cdn.dummyjson.com/product-images/11/thumbnail.jpg",
+      image: "https://cdn.dummyjson.com/product-images/11/thumbnail.jpg",
     },
     {
       id: 12,
       name: "Brown Perfume",
       price: 40,
       rating: 4,
-      image:
-        "https://cdn.dummyjson.com/product-images/12/thumbnail.jpg",
+      image: "https://cdn.dummyjson.com/product-images/12/thumbnail.jpg",
     },
-  ]
+  ];
   productData.forEach((product) => {
     server.create("product", product);
   });

@@ -1,4 +1,7 @@
 import { AddShoppingCartOutlined } from "@mui/icons-material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { useState } from "react";
 import {
   Button,
   Card,
@@ -11,8 +14,8 @@ import {
 import React from "react";
 import "./ProductCard.css";
 
-// Product card from mui
-const ProductCard = ({ product, handleAddToCart }) => {
+const ProductCard = ({ product, handleAddToCart, handleFavorites }) => {
+  const [fav, SetFav] = useState(false);
   return (
     <Card className="card">
       <CardMedia
@@ -36,10 +39,22 @@ const ProductCard = ({ product, handleAddToCart }) => {
           fullWidth
           variant="contained"
           onClick={handleAddToCart}
-          data-cy="add-to-cart-button" 
+          data-cy="add-to-cart-button"
+          data-testid="addToCart"
         >
           <AddShoppingCartOutlined />
           ADD TO CART
+        </Button>
+        <Button
+          onClick={() => {
+            SetFav(!fav);
+          }}
+        >
+          {fav ? (
+            <FavoriteIcon color="error" />
+          ) : (
+            <FavoriteBorderIcon color="error" />
+          )}
         </Button>
       </CardActions>
     </Card>
